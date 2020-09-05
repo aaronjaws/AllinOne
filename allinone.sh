@@ -107,18 +107,19 @@ install_speedtest() {
 
 # Launchpad
 echo
-echo "-- AllinOne.sh [v${sh_ver}] --"
+echo "AllinOne.sh [v${sh_ver}]"
 echo
+echo "----------------------"
 echo "- ESSENTIAL"
 echo
 echo "0. first time setup"
-echo "————————————"
+echo "----------------------"
 echo "- IPTABLES"
 echo
 echo "1. setup relay"
 echo "2. clear all shit"
 echo "3. view NAT rules"
-echo "————————————"
+echo "----------------------"
 echo "- SHIT INSTALLING"
 echo
 echo "4. kernel upgrade"
@@ -126,8 +127,9 @@ echo "5. install haproxy 2.1"
 echo "6. install docker"
 echo "7. install speedtest"
 echo
+echo "----------------------"
 
-read -p " Enter (0-7):" num
+read -p "Enter (0-7):" num
 if [[ ! ${num} =~ ^[0-7]$ ]]; then
 	echo "enter ONLY from 0-7 bruh"
 else
