@@ -2,7 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-sh_ver="1.0.1"
+sh_ver="1.0.2"
 
 # - ESSENTIAL
 install_env() {
@@ -76,6 +76,68 @@ Add_iptables() {
 	echo 'iptables-restore < /root/rules' >>/etc/rc.local
 	chmod +x /etc/rc.local
 }
+install_fullcone() {
+	# Install build needed packages
+	apt install build-essential autoconf autogen libtool pkg-config libgmp3-dev bison flex libreadline-dev git -y
+	# Download sources
+	cd /root/
+	git clone git://git.netfilter.org/libmnl
+	git clone git://git.netfilter.org/libnftnl.git
+	git clone git://git.netfilter.org/iptables.git
+	git clone https://github.com/Chion82/netfilter-full-cone-nat.git
+	PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+	export PKG_CONFIG_PATH
+	# Make libmnl
+	cd libmnl
+	sh autogen.sh
+	./configure
+	make
+	make install
+	# Make libnftn
+	cd libnftnl
+	sh autogen.sh
+	./configure
+	make
+	make install
+	# Make modules
+	cd ~/netfilter-full-cone-nat
+	make
+	modprobe nf_nat
+	insmod xt_FULLCONENAT.ko
+	# Make iptables
+	cp ~/netfilter-full-cone-nat/libipt_FULLCONENAT.c ~/iptables/extensions/
+	cd ~/iptables
+	ln -sfv /usr/sbin/xtables-multi /usr/bin/iptables-xml
+	./autogen.sh
+	./configure
+	make
+	make install
+	# Replace iptables
+	rm -rf /sbin/iptables
+	rm -rf /sbin/iptables-restore
+	rm -rf /sbin/iptables-save
+	cd /usr/local/sbin
+	cp /usr/local/sbin/iptables /sbin/
+	cp /usr/local/sbin/iptables-restore /sbin/
+	cp /usr/local/sbin/iptables-save /sbin/
+	# Make FullCone modules loaded on boot
+	cd /root/
+	kernel=$(uname -r)
+	cp ~/netfilter-full-cone-nat/xt_FULLCONENAT.ko /lib/modules/$kernel/
+	depmod
+	echo '#!/bin/sh' >>/etc/rc.local
+	echo 'modprobe xt_FULLCONENAT' >>/etc/rc.local
+	chmod +x /etc/rc.local
+	# Add FullCone rules toward iptables
+	read -e -p "Type in the ethernet name that you are using:" ethernet_name
+	[[ -z "${ethernet_name}" ]] && echo "Enter something when asking" && exit 1
+	iptables -t nat -A POSTROUTING -o ${ethernet_name} -j FULLCONENAT
+	iptables -t nat -A PREROUTING -i ${ethernet_name} -j FULLCONENAT
+	iptables-save >/root/rules
+	rm -rf /root/lib* /root/netfilter-full-cone-nat /root/iptables
+
+}
+
 View_forwarding() {
 	iptables -nvL -t nat
 }
@@ -117,21 +179,22 @@ echo "----------------------"
 echo "- IPTABLES"
 echo
 echo "1. setup relay"
-echo "2. clear all shit"
-echo "3. view NAT rules"
+echo "2. set up fullcone"
+echo "3. clear all shit"
+echo "4. view NAT rules"
 echo "----------------------"
 echo "- SHIT INSTALLING"
 echo
-echo "4. kernel upgrade"
-echo "5. install haproxy 2.1"
-echo "6. install docker"
-echo "7. install speedtest"
+echo "5. kernel upgrade"
+echo "6. install haproxy 2.1"
+echo "7. install docker"
+echo "8. install speedtest"
 echo
 echo "----------------------"
 
-read -p "Enter (0-7):" num
-if [[ ! ${num} =~ ^[0-7]$ ]]; then
-	echo "enter ONLY from 0-7 bruh"
+read -p "Enter (0-8):" num
+if [[ ! ${num} =~ ^[0-8]$ ]]; then
+	echo "enter ONLY from 0-8 bruh"
 else
 	case "${num}" in
 	0)
@@ -145,27 +208,32 @@ else
 		;;
 	2)
 		check_iptables
-		Clear_iptables
+		install_fullcone
 		break
 		;;
 	3)
 		check_iptables
-		View_forwarding
+		Clear_iptables
 		break
 		;;
 	4)
-		kernel_upgrade
+		check_iptables
+		View_forwarding
 		break
 		;;
 	5)
-		install_haproxy
+		kernel_upgrade
 		break
 		;;
 	6)
-		install_docker
+		install_haproxy
 		break
 		;;
 	7)
+		install_docker
+		break
+		;;
+	8)
 		install_speedtest
 		break
 		;;
