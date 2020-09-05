@@ -72,6 +72,9 @@ Add_iptables() {
 	iptables -t nat -A POSTROUTING -p tcp -d ${forwarding_ip} --dport ${forwarding_port} -j SNAT --to-source ${local_ip}
 	iptables -t nat -A POSTROUTING -p udp -d ${forwarding_ip} --dport ${forwarding_port} -j SNAT --to-source ${local_ip}
 	iptables-save >/root/rules
+	echo '#!/bin/sh' >>/etc/rc.local
+	echo 'iptables-restore < /root/rules' >>/etc/rc.local
+	chmod +x /etc/rc.local
 }
 View_forwarding() {
 	iptables -nvL -t nat
