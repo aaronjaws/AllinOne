@@ -128,30 +128,38 @@ read -e -p " Enter (0-7):" num
 case "$num" in
 0)
 	install_env
+	break
 	;;
 1)
 	check_iptables
 	Add_iptables
+	break
 	;;
 2)
 	check_iptables
 	Clear_iptables
+	break
 	;;
 3)
 	check_iptables
 	View_forwarding
+	break
 	;;
 4)
 	kernel_upgrade
+	break
 	;;
 5)
 	install_haproxy
+	break
 	;;
 6)
 	install_docker
+	break
 	;;
 7)
 	install_speedtest
+	break
 	;;
 *)
 	echo "enter ONLY from 0-7 bruh"
