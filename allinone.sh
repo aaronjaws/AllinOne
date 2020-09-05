@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
 
-sh_ver="1.0.0"
+sh_ver="1.0.1"
 
 # - ESSENTIAL
 install_env() {
@@ -104,64 +106,66 @@ install_speedtest() {
 }
 
 # Launchpad
-echo && echo -e "
--- Relay.sh [v${sh_ver}] --
+echo
+echo "-- AllinOne.sh [v${sh_ver}] --"
+echo
+echo "- ESSENTIAL"
+echo
+echo "0. first time setup"
+echo "————————————"
+echo "- IPTABLES"
+echo
+echo "1. setup relay"
+echo "2. clear all shit"
+echo "3. view NAT rules"
+echo "————————————"
+echo "- SHIT INSTALLING"
+echo
+echo "4. kernel upgrade"
+echo "5. install haproxy 2.1"
+echo "6. install docker"
+echo "7. install speedtest"
+echo
 
-- ESSENTIAL
-
-0. first time setup
-————————————
-- IPTABLES
-
-1. setup relay
-2. clear all shit
-3. view NAT rules
-————————————
-- SHIT INSTALLING
-
-4. kernel upgrade
-5. install haproxy 2.1
-6. install docker
-7. install speedtest
-" && echo
-read -e -p " Enter (0-7):" num
-case "${num}" in
-0)
-	install_env
-	break
-	;;
-1)
-	check_iptables
-	Add_iptables
-	break
-	;;
-2)
-	check_iptables
-	Clear_iptables
-	break
-	;;
-3)
-	check_iptables
-	View_forwarding
-	break
-	;;
-4)
-	kernel_upgrade
-	break
-	;;
-5)
-	install_haproxy
-	break
-	;;
-6)
-	install_docker
-	break
-	;;
-7)
-	install_speedtest
-	break
-	;;
-*)
+read -p " Enter (0-7):" num
+if [[ ! ${num} =~ ^[0-7]$ ]]; then
 	echo "enter ONLY from 0-7 bruh"
-	;;
-esac
+else
+	case "${num}" in
+	0)
+		install_env
+		break
+		;;
+	1)
+		check_iptables
+		Add_iptables
+		break
+		;;
+	2)
+		check_iptables
+		Clear_iptables
+		break
+		;;
+	3)
+		check_iptables
+		View_forwarding
+		break
+		;;
+	4)
+		kernel_upgrade
+		break
+		;;
+	5)
+		install_haproxy
+		break
+		;;
+	6)
+		install_docker
+		break
+		;;
+	7)
+		install_speedtest
+		break
+		;;
+	esac
+fi
