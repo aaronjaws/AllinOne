@@ -199,43 +199,34 @@ else
 	case "${num}" in
 	0)
 		install_env
-		break
 		;;
 	1)
 		check_iptables
 		Add_iptables
-		break
 		;;
 	2)
 		check_iptables
 		install_fullcone
-		break
 		;;
 	3)
 		check_iptables
 		Clear_iptables
-		break
 		;;
 	4)
 		check_iptables
 		View_forwarding
-		break
 		;;
 	5)
 		kernel_upgrade
-		break
 		;;
 	6)
 		install_haproxy
-		break
 		;;
 	7)
 		install_docker
-		break
 		;;
 	8)
 		install_speedtest
-		break
 		;;
 	esac
 fi
