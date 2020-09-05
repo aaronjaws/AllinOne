@@ -193,9 +193,9 @@ echo "9. install fullcone rules"
 echo
 echo "----------------------"
 
-read -p "Enter (0-8):" num
-if [[ ! ${num} =~ ^[0-8]$ ]]; then
-	echo "enter ONLY from 0-8 bruh"
+read -p "Enter (0-9):" num
+if [[ ! ${num} =~ ^[0-9]$ ]]; then
+	echo "enter ONLY from 0-9 bruh"
 else
 	case "${num}" in
 	0)
