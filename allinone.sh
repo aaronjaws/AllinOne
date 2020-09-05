@@ -77,6 +77,10 @@ Add_iptables() {
 	iptables -t nat -A POSTROUTING -p udp -d ${forwarding_ip} --dport ${forwarding_port} -j SNAT --to-source ${local_ip}
 	iptables-save >/root/rules
 }
+View_forwarding() {
+	iptables -nvL -t nat
+}
+
 install_fullcone() {
 	# Install build needed packages
 	apt install build-essential autoconf autogen libtool pkg-config libgmp3-dev bison flex libreadline-dev git -y
@@ -130,19 +134,8 @@ install_fullcone() {
 	rm -rf /root/lib* /root/netfilter-full-cone-nat /root/iptables
 
 }
-add_fullcone() {
-	read -e -p "Type in the ethernet name that you are using:" ethernet_name
-	[[ -z "${ethernet_name}" ]] && echo "Enter something when asking" && exit 1
-	iptables -t nat -A POSTROUTING -o ${ethernet_name} -j FULLCONENAT
-	iptables -t nat -A PREROUTING -i ${ethernet_name} -j FULLCONENAT
-	iptables-save >/root/rules
-}
 
-View_forwarding() {
-	iptables -nvL -t nat
-}
-
-# - SHIT INSTALLING
+# - MISC
 kernel_upgrade() {
 	apt install -t buster-backports linux-image-cloud-amd64 linux-headers-cloud-amd64 -y
 }
@@ -165,6 +158,13 @@ install_speedtest() {
 	echo "deb https://ookla.bintray.com/debian stretch main" | tee /etc/apt/sources.list.d/speedtest.list
 	apt update --allow-insecure-repositories
 	apt -y install speedtest
+}
+add_fullcone() {
+	read -e -p "Type in the ethernet name that you are using:" ethernet_name
+	[[ -z "${ethernet_name}" ]] && echo "Enter something when asking" && exit 1
+	iptables -t nat -A POSTROUTING -o ${ethernet_name} -j FULLCONENAT
+	iptables -t nat -A PREROUTING -i ${ethernet_name} -j FULLCONENAT
+	iptables-save >/root/rules
 }
 
 # Launchpad
