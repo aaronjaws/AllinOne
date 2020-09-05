@@ -125,7 +125,7 @@ echo && echo -e "
 7. install speedtest
 " && echo
 read -e -p " Enter (0-7):" num
-case "$num" in
+case "${num}" in
 0)
 	install_env
 	break
