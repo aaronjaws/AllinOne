@@ -127,14 +127,15 @@ install_fullcone() {
 	cp ~/netfilter-full-cone-nat/xt_FULLCONENAT.ko /lib/modules/$kernel/
 	depmod
 	echo 'modprobe xt_FULLCONENAT' >>/etc/rc.local
-	# Add FullCone rules toward iptables
+	rm -rf /root/lib* /root/netfilter-full-cone-nat /root/iptables
+
+}
+add_fullcone() {
 	read -e -p "Type in the ethernet name that you are using:" ethernet_name
 	[[ -z "${ethernet_name}" ]] && echo "Enter something when asking" && exit 1
 	iptables -t nat -A POSTROUTING -o ${ethernet_name} -j FULLCONENAT
 	iptables -t nat -A PREROUTING -i ${ethernet_name} -j FULLCONENAT
 	iptables-save >/root/rules
-	rm -rf /root/lib* /root/netfilter-full-cone-nat /root/iptables
-
 }
 
 View_forwarding() {
@@ -178,16 +179,17 @@ echo "----------------------"
 echo "- IPTABLES"
 echo
 echo "1. setup relay"
-echo "2. set up fullcone"
-echo "3. clear all shit"
+echo "2. setup fullcone"
+echo "3. clear all iptables rules"
 echo "4. view NAT rules"
 echo "----------------------"
-echo "- SHIT INSTALLING"
+echo "- MISC"
 echo
 echo "5. kernel upgrade"
 echo "6. install haproxy 2.1"
 echo "7. install docker"
 echo "8. install speedtest"
+echo "9. install fullcone rules"
 echo
 echo "----------------------"
 
@@ -205,6 +207,7 @@ else
 		;;
 	2)
 		install_fullcone
+		add_fullcone
 		;;
 	3)
 		check_iptables
@@ -225,6 +228,9 @@ else
 		;;
 	8)
 		install_speedtest
+		;;
+	9)
+		add_fullcone
 		;;
 	esac
 fi
