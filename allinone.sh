@@ -127,6 +127,7 @@ install_fullcone() {
 	depmod
 	echo '#!/bin/sh' >>/etc/rc.local
 	echo 'modprobe xt_FULLCONENAT' >>/etc/rc.local
+	echo 'iptables-restore < /root/rules' >>/etc/rc.local
 	chmod +x /etc/rc.local
 	# Add FullCone rules toward iptables
 	read -e -p "Type in the ethernet name that you are using:" ethernet_name
@@ -205,7 +206,6 @@ else
 		Add_iptables
 		;;
 	2)
-		check_iptables
 		install_fullcone
 		;;
 	3)
