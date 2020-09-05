@@ -29,6 +29,10 @@ install_env() {
 	cat limits >/etc/security/limits.conf
 	cat sysctl >>/etc/sysctl.conf
 	rm -rf limits sysctl
+	iptables-save >/root/rules
+	echo '#!/bin/sh' >>/etc/rc.local
+	echo 'iptables-restore < /root/rules' >>/etc/rc.local
+	chmod +x /etc/rc.local
 }
 
 # - IPTABLES
@@ -72,9 +76,6 @@ Add_iptables() {
 	iptables -t nat -A POSTROUTING -p tcp -d ${forwarding_ip} --dport ${forwarding_port} -j SNAT --to-source ${local_ip}
 	iptables -t nat -A POSTROUTING -p udp -d ${forwarding_ip} --dport ${forwarding_port} -j SNAT --to-source ${local_ip}
 	iptables-save >/root/rules
-	echo '#!/bin/sh' >>/etc/rc.local
-	echo 'iptables-restore < /root/rules' >>/etc/rc.local
-	chmod +x /etc/rc.local
 }
 install_fullcone() {
 	# Install build needed packages
@@ -125,10 +126,7 @@ install_fullcone() {
 	kernel=$(uname -r)
 	cp ~/netfilter-full-cone-nat/xt_FULLCONENAT.ko /lib/modules/$kernel/
 	depmod
-	echo '#!/bin/sh' >>/etc/rc.local
 	echo 'modprobe xt_FULLCONENAT' >>/etc/rc.local
-	echo 'iptables-restore < /root/rules' >>/etc/rc.local
-	chmod +x /etc/rc.local
 	# Add FullCone rules toward iptables
 	read -e -p "Type in the ethernet name that you are using:" ethernet_name
 	[[ -z "${ethernet_name}" ]] && echo "Enter something when asking" && exit 1
