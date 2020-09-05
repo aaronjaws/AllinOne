@@ -88,13 +88,13 @@ install_fullcone() {
 	PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 	export PKG_CONFIG_PATH
 	# Make libmnl
-	cd libmnl
+	cd /root/libmnl
 	sh autogen.sh
 	./configure
 	make
 	make install
 	# Make libnftn
-	cd libnftnl
+	cd /root/libnftnl
 	sh autogen.sh
 	./configure
 	make
