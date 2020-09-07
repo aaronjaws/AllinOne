@@ -137,7 +137,23 @@ install_fullcone() {
 
 # - MISC
 kernel_upgrade() {
-	apt install -t buster-backports linux-image-cloud-amd64 linux-headers-cloud-amd64 -y
+	read -p "Do you wanna update your source? 0:No 1:Yes:" sources_update
+	if [[ ! ${sources_update} =~ ^[0-1]$ ]]; then
+		echo "enter ONLY from 0-1 bruh"
+	else
+		case "${sources_update}" in
+		0)
+			apt install -t buster-backports linux-image-cloud-amd64 linux-headers-cloud-amd64 -y
+			;;
+		1)
+			wget config.nliu.work/sources_d10.list
+			cat sources_d10.list >/etc/apt/sources.list
+			apt update
+			rm -rf sources_d10.list
+			apt install -t buster-backports linux-image-cloud-amd64 linux-headers-cloud-amd64 -y
+			;;
+		esac
+	fi
 }
 install_haproxy() {
 	# Install haproxy
