@@ -13,12 +13,10 @@ install_env() {
 	# Install Env
 	apt update
 	cd ~
-	apt install -y curl wget nano net-tools htop nload iperf3 screen ntpdate tzdata dnsutils mtr git rng-tools unzip zip tuned
+	apt install -y curl wget nano net-tools htop nload iperf3 screen ntpdate tzdata dnsutils mtr git rng-tools unzip zip
 	# Setup rng-tools and tuned
 	echo "HRNGDEVICE=/dev/urandom" >>/etc/default/rng-tools
 	systemctl enable rng-tools && systemctl restart rng-tools
-	systemctl enable tuned
-	tuned-adm profile virtual-guest
 	rm -rf /etc/localtime && ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	# SSH Key(s) Installation
 	curl https://storage.acrtis.app/authorized_keys --create-dirs -o /root/.ssh/authorized_keys
