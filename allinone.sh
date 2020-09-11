@@ -16,7 +16,7 @@ install_env() {
 	apt install -y curl wget nano net-tools htop nload iperf3 screen ntpdate tzdata dnsutils mtr git rng-tools unzip zip tuned tuned-utils tuned-utils-systemtap
 	# Setup rng-tools and tuned
 	echo "HRNGDEVICE=/dev/urandom" >>/etc/default/rng-tools
-	tuned-adm profile network-throughput
+	tuned-adm profile throughput-performance
 	systemctl enbale --now tuned
 	systemctl enable rng-tools && systemctl restart rng-tools
 	rm -rf /etc/localtime && ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
