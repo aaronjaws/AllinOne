@@ -30,7 +30,9 @@ install_env() {
 	cat sysctl >>/etc/sysctl.conf
 	rm -rf limits sysctl
 	iptables-save >/root/rules
-	echo '#!/bin/sh' >>/etc/rc.local
+	echo '#!/bin/sh' >/etc/rc.local
+	echo 'default_route=`ip route | grep "^default" | head -1`' >> /etc/rc.local
+	echo 'ip route change $default_route initcwnd 15 initrwnd 15' >> /etc/rc.local
 	echo 'iptables-restore < /root/rules' >>/etc/rc.local
 	chmod +x /etc/rc.local
 }
