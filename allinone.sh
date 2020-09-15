@@ -193,9 +193,9 @@ echo "|i. install speedtest      |"
 echo "|j. install fullcone rules |"
 echo "+--------------------------+"
 
-read -p "Enter (1-9):" num
-if [[ ! ${num} =~ ^[1-9]$ ]]; then
-	echo "enter ONLY from 1-9 bruh"
+read -p "Enter (a-j):" num
+if [[ ! ${num} =~ ^[a-j]$ ]]; then
+	echo "enter ONLY from a-j bruh"
 else
 	case "${num}" in
 	a)
