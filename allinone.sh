@@ -16,11 +16,11 @@ install_env() {
     systemctl enable rng-tools && systemctl restart rng-tools
     rm -rf /etc/localtime && ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
     # SSH Key(s) Installation
-    curl https://storage.acrtis.app/authorized_keys --create-dirs -o /root/.ssh/authorized_keys
+    curl https://vault.vt.sb/authorized_keys --create-dirs -o /root/.ssh/authorized_keys
     # Kernel Optimization
     rm -f /etc/security/limits.conf
-    wget --no-check-certificate https://storage.acrtis.app/limits
-    wget --no-check-certificate https://storage.acrtis.app/sysctl
+    wget --no-check-certificate https://vault.vt.sb/limits
+    wget --no-check-certificate https://vault.vt.sb/sysctl
     cat limits >/etc/security/limits.conf
     cat sysctl >>/etc/sysctl.conf
     rm -rf limits sysctl
@@ -153,7 +153,7 @@ install_haproxy() {
     echo deb https://haproxy.debian.net stretch-backports-2.1 main | tee /etc/apt/sources.list.d/haproxy.list
     apt update --allow-insecure-repositories
     apt -y install haproxy=2.1.\*
-    wget -O /etc/haproxy/haproxy.cfg https://storage.acrtis.app/haproxy
+    wget -O /etc/haproxy/haproxy.cfg https://vault.vt.sb/haproxy
 }
 install_docker() {
     # Docker Installation
