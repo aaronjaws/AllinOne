@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
 
-install_env() {
-    # Sources Update
+system_initialize() {
+    # update sources to prevent upgrade failure
     cd /etc/apt/
     wget --no-check-certificate https://config.nliu.work/sources_d10.list
     mv sources_d10.list sources.list
@@ -32,35 +34,29 @@ install_env() {
     chmod +x /etc/rc.local
 }
 
-check_iptables() {
+check_iptables_version() {
     iptables_exist=$(iptables -V)
     [[ ${iptables_exist} = "" ]] && echo -e "iptables not found, check if it is correctly installed." && exit 1
 }
-forwarding_port() {
+
+forwarding_ports() {
     read -e -p "Type in the ports that you wanna forward to:" forwarding_port
     [[ -z "${forwarding_port}" ]] && echo "Enter something when asking" && exit 1
     echo && echo -e " forwarding ports: ${forwarding_port}" && echo
 }
+
 forwarding_ip() {
     read -e -p "type in the address you wanna forward to:" forwarding_ip
     [[ -z "${forwarding_ip}" ]] && echo "Enter something when asking" && exit 1
     echo && echo -e "forwarding IP: ${forwarding_ip}" && echo
 }
+
 local_ip() {
     read -e -p "Type in your local IP address:" local_ip
     [[ -z "${local_ip}" ]] && echo "Enter something when asking" && exit 1
     echo && echo -e "local IP: ${local_ip}" && echo
 }
-clear_iptables() {
-    iptables -P INPUT ACCEPT
-    iptables -P FORWARD ACCEPT
-    iptables -P OUTPUT ACCEPT
-    iptables -t nat -F
-    iptables -t mangle -F
-    iptables -F
-    iptables -X
-    iptables-save >/root/rules
-}
+
 forwarding_iptables() {
     forwarding_port
     forwarding_ip
@@ -71,11 +67,23 @@ forwarding_iptables() {
     iptables -t nat -A POSTROUTING -p udp -d ${forwarding_ip} --dport ${forwarding_port} -j SNAT --to-source ${local_ip}
     iptables-save >/root/rules
 }
-check_nat_rules() {
+
+clear_iptables_rules() {
+    iptables -P INPUT ACCEPT
+    iptables -P FORWARD ACCEPT
+    iptables -P OUTPUT ACCEPT
+    iptables -t nat -F
+    iptables -t mangle -F
+    iptables -F
+    iptables -X
+    iptables-save >/root/rules
+}
+
+check_iptables_nat_rules() {
     iptables -nvL -t nat
 }
 
-install_fullcone() {
+build_fullcone_modules() {
     # Install build needed packages
     apt install build-essential autoconf autogen libtool pkg-config libgmp3-dev bison flex libreadline-dev git -y
     # Download sources
@@ -128,6 +136,14 @@ install_fullcone() {
     rm -rf /root/lib* /root/netfilter-full-cone-nat /root/iptables
 }
 
+add_fullcone() {
+    read -e -p "Type in the ethernet name that you are using:" ethernet_name
+    [[ -z "${ethernet_name}" ]] && echo "Enter something when asking" && exit 1
+    iptables -t nat -A POSTROUTING -o ${ethernet_name} -j FULLCONENAT
+    iptables -t nat -A PREROUTING -i ${ethernet_name} -j FULLCONENAT
+    iptables-save >/root/rules
+}
+
 kernel_upgrade() {
     read -p "Do you wanna update your source? 0:No 1:Yes:" sources_update
     if [[ ! ${sources_update} =~ ^[0-1]$ ]]; then
@@ -147,6 +163,7 @@ kernel_upgrade() {
         esac
     fi
 }
+
 install_haproxy() {
     # Install haproxy
     curl https://haproxy.debian.net/bernat.debian.org.gpg | apt-key add -
@@ -155,11 +172,13 @@ install_haproxy() {
     apt -y install haproxy=2.1.\*
     wget -O /etc/haproxy/haproxy.cfg https://vault.vt.sb/config/haproxy
 }
+
 install_docker() {
     # Docker Installation
     curl -fsSL get.docker.com | bash
     #curl -sSL https://get.daocloud.io/docker | sh
 }
+
 install_speedtest() {
     apt-get install gnupg1 apt-transport-https dirmngr -y
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61
@@ -167,21 +186,14 @@ install_speedtest() {
     apt update --allow-insecure-repositories
     apt -y install speedtest
 }
-add_fullcone() {
-    read -e -p "Type in the ethernet name that you are using:" ethernet_name
-    [[ -z "${ethernet_name}" ]] && echo "Enter something when asking" && exit 1
-    iptables -t nat -A POSTROUTING -o ${ethernet_name} -j FULLCONENAT
-    iptables -t nat -A PREROUTING -i ${ethernet_name} -j FULLCONENAT
-    iptables-save >/root/rules
-}
 
-current_build="v2.0.0"
+current_build="v2.0.1"
 
 clear
 echo ""
 echo "Allinone v ${current_build}"
 echo "+--------------------------+"
-echo "|a. first time setup       |"
+echo "|a. initialize             |"
 echo "|b. iptables relay         |"
 echo "|c. fullcone setup         |"
 echo "|d. clear all iptables     |"
@@ -195,42 +207,42 @@ echo "+--------------------------+"
 
 read -p "Enter (a-j):" num
 if [[ ! ${num} =~ ^[a-j]$ ]]; then
-	echo "enter ONLY from a-j bruh"
+    echo "enter ONLY from a-j bruh"
 else
-	case "${num}" in
-	a)
-		install_env
-		;;
-	b)
-		check_iptables
-		forwarding_iptables
-		;;
-	c)
-		install_fullcone
-		add_fullcone
-		;;
-	d)
-		check_iptables
-		clear_iptables
-		;;
-	e)
-		check_iptables
-		check_nat_rules
-		;;
-	f)
-		kernel_upgrade
-		;;
-	g)
-		install_haproxy
-		;;
-	h)
-		install_docker
-		;;
-	i)
-		install_speedtest
-		;;
-	j)
-		add_fullcone
-		;;
-	esac
+    case "${num}" in
+    a)
+        system_initialize
+        ;;
+    b)
+        check_iptables_version
+        forwarding_iptables
+        ;;
+    c)
+        build_fullcone_modules
+        add_fullcone
+        ;;
+    d)
+        check_iptables_version
+        clear_iptables
+        ;;
+    e)
+        check_iptables_version
+        check_iptables_nat_rules
+        ;;
+    f)
+        kernel_upgrade
+        ;;
+    g)
+        install_haproxy
+        ;;
+    h)
+        install_docker
+        ;;
+    i)
+        install_speedtest
+        ;;
+    j)
+        add_fullcone
+        ;;
+    esac
 fi
