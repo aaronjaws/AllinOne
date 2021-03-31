@@ -5,14 +5,16 @@ export PATH
 current_build="v20210331"
 
 install_dependencies(){
-    # joker version
+    # brook and joker latest version
     joker_version=$(wget -qO- https://api.github.com/repos/txthinking/joker/releases| grep "tag_name"| head -n 1| awk -F ":" '{print $2}'| sed 's/\"//g;s/,//g;s/ //g')
+    brook_version=$(wget -qO- https://api.github.com/repos/txthinking/brook/releases| grep "tag_name"| head -n 1| awk -F ":" '{print $2}'| sed 's/\"//g;s/,//g;s/ //g')
     # update sources to prevent upgrade failure
     curl -L https://config.nliu.work/sources_d10.list -o /etc/apt/sources.list
     # install dependencies
     apt update
     apt install -y curl wget nano net-tools htop nload iperf3 screen ntpdate tzdata dnsutils mtr git rng-tools unzip zip tuned tuned-utils tuned-utils-systemtap
     curl -L https://github.com/txthinking/joker/releases/download/${joker_version}/joker_linux_amd64 -o /usr/local/bin/joker
+    curl -L https://github.com/txthinking/brook/releases/download/${brook_version}/brook_linux_amd64 -o /usr/local/bin/brook
     # setup rng-tools and tuned
     echo "HRNGDEVICE=/dev/urandom" >> /etc/default/rng-tools
     tuned-adm profile throughput-performance
@@ -34,7 +36,7 @@ install_dependencies(){
     echo 'default_route=`ip route | grep "^default" | head -1`' >> /etc/rc.local
     echo 'ip route change $default_route initcwnd 15 initrwnd 15' >> /etc/rc.local
     echo 'iptables-restore < /root/rules' >> /etc/rc.local
-    chmod +x /etc/rc.local && chmod +x /usr/local/bin/joker
+    chmod +x /etc/rc.local && chmod +x /usr/local/bin/joker && chmod +x /usr/local/bin/brook
     clear
 }
 
@@ -57,13 +59,6 @@ kernel_upgrade() {
 }
 
 # start relay with brook
-install_brook_and_joker(){
-    brook_version=$(wget -qO- https://api.github.com/repos/txthinking/brook/releases| grep "tag_name"| head -n 1| awk -F ":" '{print $2}'| sed 's/\"//g;s/,//g;s/ //g')
-    
-    curl -L https://github.com/txthinking/brook/releases/download/${brook_version}/brook_linux_amd64 -o /usr/local/bin/brook
-    chmod +x /usr/local/bin/brook
-}
-
 brook_src_port(){
     read -e -p "what is the port that your local server listen to ? :" brook_src_port
     [[ -z "${brook_src_port}" ]] && echo "Enter something when asking" && exit 1
