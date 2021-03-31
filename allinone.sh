@@ -243,7 +243,6 @@ else
         add_fullcone
         ;;
     e)
-        install_brook_and_joker
         brook_src_port
         brook_dst_ip
         brook_dst_port
