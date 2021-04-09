@@ -225,10 +225,7 @@ echo "|j. DELTE ALL RULES        |"
 echo "+--------------------------+"
 
 read -p "Enter (a-j):" num
-if [[ ! ${num} =~ ^[a-j]$ ]]; then
-    echo "enter ONLY from a-j bruh"
-else
-    case "${num}" in
+case "${num}" in
     a)
         install_dependencies
         ;;
@@ -267,4 +264,3 @@ else
         clear_iptables_rules
         ;;
     esac
-fi
