@@ -1,12 +1,14 @@
-![AARONJAWS.png](https://i.loli.net/2020/09/05/WFkZjA7v498GqRI.png)
+![AARONJAWSpng](https://i.loli.net/2020/09/05/WFkZjA7v498GqRI.png)
 
 # AllinOne
 
-Could be used when first time logging in into VM, modify the script as you needed.
+Could be used when first time logging in into VM, modify the script as your needed.
 
 ## Installation
+
 ```bash
 chmox +x allinone.sh
+
 bash allinone.sh
 ```
 
@@ -17,4 +19,5 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 ## License
+
 [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0/)
