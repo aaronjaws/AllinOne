@@ -42,9 +42,6 @@ install_dependencies(){
 
 kernel_upgrade() {
     read -p "Do you wanna update your source? [y/n]:" sources_update
-    if [[ ! ${sources_update} =~ ^[0-1]$ ]]; then
-        echo "enter ONLY from 0-1 bruh"
-    else
         case "${sources_update}" in
         n)
             apt install -t buster-backports linux-image-cloud-amd64 linux-headers-cloud-amd64 -y
@@ -55,7 +52,6 @@ kernel_upgrade() {
             apt install -t buster-backports linux-image-cloud-amd64 linux-headers-cloud-amd64 -y
             ;;
         esac
-    fi
 }
 
 # start relay with brook
