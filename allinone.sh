@@ -33,8 +33,8 @@ install_dependencies(){
     iptables-save > /root/rules
     # startup scripts
     echo '#!/bin/sh' > /etc/rc.local
-    echo 'default_route=`ip route | grep "^default" | head -1`' >> /etc/rc.local
-    echo 'ip route change $default_route initcwnd 15 initrwnd 15' >> /etc/rc.local
+    #echo 'default_route=`ip route | grep "^default" | head -1`' >> /etc/rc.local
+    #echo 'ip route change $default_route initcwnd 15 initrwnd 15' >> /etc/rc.local
     echo 'iptables-restore < /root/rules' >> /etc/rc.local
     chmod +x /etc/rc.local && chmod +x /usr/local/bin/joker && chmod +x /usr/local/bin/brook
     clear
