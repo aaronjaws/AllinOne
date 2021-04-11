@@ -12,7 +12,7 @@ install_dependencies(){
     curl -L https://config.nliu.work/sources_d10.list -o /etc/apt/sources.list
     # install dependencies
     apt update
-    apt install -y curl wget nano net-tools htop nload iperf3 screen ntpdate tzdata dnsutils mtr git rng-tools unzip zip tuned tuned-utils tuned-utils-systemtap
+    apt install -y curl wget nano net-tools htop nload iperf3 screen ntpdate tzdata dnsutils mtr git rng-tools unzip zip tuned tuned-utils tuned-utils-systemtap bash-completion
     curl -L https://github.com/txthinking/joker/releases/download/${joker_version}/joker_linux_amd64 -o /usr/local/bin/joker
     curl -L https://github.com/txthinking/brook/releases/download/${brook_version}/brook_linux_amd64 -o /usr/local/bin/brook
     # setup rng-tools and tuned
