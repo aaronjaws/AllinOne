@@ -8,7 +8,6 @@ install_dependencies(){
     # brook, joker and jinbe latest version
     joker_version=$(wget -qO- https://api.github.com/repos/txthinking/joker/releases| grep "tag_name"| head -n 1| awk -F ":" '{print $2}'| sed 's/\"//g;s/,//g;s/ //g')
     brook_version=$(wget -qO- https://api.github.com/repos/txthinking/brook/releases| grep "tag_name"| head -n 1| awk -F ":" '{print $2}'| sed 's/\"//g;s/,//g;s/ //g')
-    jinbe_version=$(wget -qO- https://api.github.com/repos/txthinking/jinbe/releases| grep "tag_name"| head -n 1| awk -F ":" '{print $2}'| sed 's/\"//g;s/,//g;s/ //g')
     # update sources to prevent upgrade failure
     curl -L https://config.nliu.work/sources_d10.list -o /etc/apt/sources.list
     # install dependencies
@@ -76,7 +75,7 @@ brook_dst_port(){
 }
 
 start_brook_relay(){
-    jinbe joker brook relay --from :${brook_src_port} --to ${brook_dst_ip}:${brook_dst_port}
+    joker brook relay --from :${brook_src_port} --to ${brook_dst_ip}:${brook_dst_port}
 }
 # end relay with brook
 
