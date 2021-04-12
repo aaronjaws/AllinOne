@@ -243,9 +243,6 @@ case "${num}" in
         start_brook_relay
         ;;
     f)
-        iptables_dst_ports
-        iptables_dst_ip
-        iptables_src_ip
         start_iptables
         ;;
     g)
