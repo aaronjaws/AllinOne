@@ -5,9 +5,10 @@ export PATH
 current_build="v20210331"
 
 install_dependencies(){
-    # brook and joker latest version
+    # brook, joker and jinbe latest version
     joker_version=$(wget -qO- https://api.github.com/repos/txthinking/joker/releases| grep "tag_name"| head -n 1| awk -F ":" '{print $2}'| sed 's/\"//g;s/,//g;s/ //g')
     brook_version=$(wget -qO- https://api.github.com/repos/txthinking/brook/releases| grep "tag_name"| head -n 1| awk -F ":" '{print $2}'| sed 's/\"//g;s/,//g;s/ //g')
+    jinbe_version=$(wget -qO- https://api.github.com/repos/txthinking/jinbe/releases| grep "tag_name"| head -n 1| awk -F ":" '{print $2}'| sed 's/\"//g;s/,//g;s/ //g')
     # update sources to prevent upgrade failure
     curl -L https://config.nliu.work/sources_d10.list -o /etc/apt/sources.list
     # install dependencies
@@ -15,6 +16,7 @@ install_dependencies(){
     apt install -y curl wget nano net-tools htop nload iperf3 screen ntpdate tzdata dnsutils mtr git rng-tools unzip zip tuned tuned-utils tuned-utils-systemtap bash-completion
     curl -L https://github.com/txthinking/joker/releases/download/${joker_version}/joker_linux_amd64 -o /usr/local/bin/joker
     curl -L https://github.com/txthinking/brook/releases/download/${brook_version}/brook_linux_amd64 -o /usr/local/bin/brook
+    curl -L https://github.com/txthinking/jinbe/releases/download/${jinbe_version}/jinbe_linux_amd64 -o /usr/local/bin/jinbe
     # setup rng-tools and tuned
     echo "HRNGDEVICE=/dev/urandom" >> /etc/default/rng-tools
     tuned-adm profile throughput-performance
@@ -36,7 +38,7 @@ install_dependencies(){
     #echo 'default_route=`ip route | grep "^default" | head -1`' >> /etc/rc.local
     #echo 'ip route change $default_route initcwnd 15 initrwnd 15' >> /etc/rc.local
     echo 'iptables-restore < /root/rules' >> /etc/rc.local
-    chmod +x /etc/rc.local && chmod +x /usr/local/bin/joker && chmod +x /usr/local/bin/brook
+    chmod +x /etc/rc.local && chmod +x /usr/local/bin/joker && chmod +x /usr/local/bin/brook && chmod +x /usr/local/bin/jinbe
     clear
 }
 
@@ -73,8 +75,8 @@ brook_dst_port(){
     echo && echo -e " dst port: ${brook_dst_port}" && echo
 }
 
-start_brook(){
-    joker brook relay --from :${brook_src_port} --to ${brook_dst_ip}:${brook_dst_port}
+start_brook_relay(){
+    jinbe joker brook relay --from :${brook_src_port} --to ${brook_dst_ip}:${brook_dst_port}
 }
 # end relay with brook
 
@@ -239,7 +241,7 @@ case "${num}" in
         brook_src_port
         brook_dst_ip
         brook_dst_port
-        start_brook
+        start_brook_relay
         ;;
     f)
         iptables_dst_ports
