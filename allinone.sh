@@ -7,37 +7,51 @@ current_build="v20210427"
 install_dependencies(){
     # brook, joker and jinbe latest version
     joker_version=$(wget -qO- https://api.github.com/repos/txthinking/joker/releases| grep "tag_name"| head -n 1| awk -F ":" '{print $2}'| sed 's/\"//g;s/,//g;s/ //g')
-    brook_version=$(wget -qO- https://api.github.com/repos/txthinking/brook/releases| grep "tag_name"| head -n 1| awk -F ":" '{print $2}'| sed 's/\"//g;s/,//g;s/ //g')
     # update sources to prevent upgrade failure
-    curl -L https://config.nliu.work/sources_d10.list -o /etc/apt/sources.list
+    echo "deb http://deb.debian.org/debian/ buster main non-free contrib
+    deb http://deb.debian.org/debian/ buster-updates main non-free contrib
+    deb http://deb.debian.org/debian/ buster-backports main non-free contrib
+    deb-src http://deb.debian.org/debian/ buster main non-free contrib
+    deb-src http://deb.debian.org/debian/ buster-updates main non-free contrib
+    deb-src http://deb.debian.org/debian/ buster-backports main non-free contrib
+    deb http://security.debian.org/ buster/updates main non-free contrib
+    deb-src http://security.debian.org/ buster/updates main non-free contrib" > /etc/apt/sources.list   
     # install dependencies
     apt update
-    apt install -y curl wget nano net-tools htop nload iperf3 screen ntpdate tzdata dnsutils mtr git rng-tools unzip zip tuned tuned-utils tuned-utils-systemtap bash-completion qemu-guest-agent cloud-init
+    apt install -y curl wget nano net-tools htop nload iperf3 screen ntpdate tzdata dnsutils mtr git unzip zip bash-completion qemu-guest-agent cloud-init haveged 
+    systemctl enable --now haveged
     curl -L https://github.com/txthinking/joker/releases/download/${joker_version}/joker_linux_amd64 -o /usr/local/bin/joker
-    curl -L https://github.com/txthinking/brook/releases/download/${brook_version}/brook_linux_amd64 -o /usr/local/bin/brook
-    # setup rng-tools and tuned
-    echo "HRNGDEVICE=/dev/urandom" >> /etc/default/rng-tools
-    tuned-adm profile throughput-performance
-    systemctl enbale --now tuned
-    systemctl enable rng-tools && systemctl restart rng-tools
     rm -rf /etc/localtime && ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
     # ssh key installation
     curl https://vault.vt.sb/linux/authorized_keys --create-dirs -o /root/.ssh/authorized_keys
     # kernel optimization
-    rm -f /etc/security/limits.conf
-    wget --no-check-certificate https://vault.vt.sb/linux/limits
+    cat > /etc/security/limits.conf << EOF
+* soft nofile 512000
+* hard nofile 512000
+* soft nproc 512000
+* hard nproc 512000
+root soft nofile 512000
+root hard nofile 512000
+root soft nproc 512000
+root hard nproc 512000
+EOF
+    cat > /etc/systemd/journald.conf <<EOF
+[Journal]
+SystemMaxUse=384M
+SystemMaxFileSize=128M
+ForwardToSyslog=no
+EOF
     wget --no-check-certificate https://vault.vt.sb/linux/sysctl
     wget -N --no-check-certificate "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh"
-    cat limits > /etc/security/limits.conf
     cat sysctl >> /etc/sysctl.conf
-    rm -rf limits sysctl
+    rm -rf sysctl
     iptables-save > /root/rules
     # startup scripts
     echo '#!/bin/sh' > /etc/rc.local
     #echo 'default_route=`ip route | grep "^default" | head -1`' >> /etc/rc.local
     #echo 'ip route change $default_route initcwnd 15 initrwnd 15' >> /etc/rc.local
     echo 'iptables-restore < /root/rules' >> /etc/rc.local
-    chmod +x /etc/rc.local && chmod +x /usr/local/bin/joker && chmod +x /usr/local/bin/brook && chmod +x /usr/local/bin/jinbe && chmod +x tcp.sh
+    chmod +x /etc/rc.local && chmod +x /usr/local/bin/joker && chmod +x tcp.sh
     clear
 }
 
