@@ -41,15 +41,15 @@ SystemMaxUse=384M
 SystemMaxFileSize=128M
 ForwardToSyslog=no
 EOF
-    wget --no-check-certificate https://vault.vt.sb/linux/sysctl
-    wget -N --no-check-certificate "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh"
-    cat sysctl >> /etc/sysctl.conf
-    rm -rf sysctl
+    #wget --no-check-certificate https://vault.vt.sb/linux/sysctl
+    #cat sysctl > /etc/sysctl.conf
+    #rm -rf sysctl
+    wget -O tcp.sh "https://git.io/coolspeeda" && chmod +x tcp.sh && ./tcp.sh
     iptables-save > /root/rules
     # startup scripts
     echo '#!/bin/sh' > /etc/rc.local
-    #echo 'default_route=`ip route | grep "^default" | head -1`' >> /etc/rc.local
-    #echo 'ip route change $default_route initcwnd 15 initrwnd 15' >> /etc/rc.local
+    echo 'default_route=`ip route | grep "^default" | head -1`' >> /etc/rc.local
+    echo 'ip route change $default_route initcwnd 15 initrwnd 15' >> /etc/rc.local
     echo 'iptables-restore < /root/rules' >> /etc/rc.local
     chmod +x /etc/rc.local && chmod +x /usr/local/bin/joker && chmod +x tcp.sh
     clear
