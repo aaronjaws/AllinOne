@@ -44,7 +44,7 @@ EOF
     #wget --no-check-certificate https://vault.vt.sb/linux/sysctl
     #cat sysctl > /etc/sysctl.conf
     #rm -rf sysctl
-    wget -O tcp.sh "https://git.io/coolspeeda" && chmod +x tcp.sh && ./tcp.sh
+    wget -O tcp.sh "https://git.io/coolspeeda"
     iptables-save > /root/rules
     # startup scripts
     echo '#!/bin/sh' > /etc/rc.local
@@ -62,7 +62,14 @@ kernel_upgrade() {
             apt install -t buster-backports linux-image-cloud-amd64 linux-headers-cloud-amd64 -y
             ;;
         y)
-            curl -L https://config.nliu.work/sources_d10.list -o /etc/apt/sources.list
+            echo "deb http://deb.debian.org/debian/ buster main non-free contrib
+            deb http://deb.debian.org/debian/ buster-updates main non-free contrib
+            deb http://deb.debian.org/debian/ buster-backports main non-free contrib
+            deb-src http://deb.debian.org/debian/ buster main non-free contrib
+            deb-src http://deb.debian.org/debian/ buster-updates main non-free contrib
+            deb-src http://deb.debian.org/debian/ buster-backports main non-free contrib
+            deb http://security.debian.org/ buster/updates main non-free contrib
+            deb-src http://security.debian.org/ buster/updates main non-free contrib" > /etc/apt/sources.list  
             apt update
             apt install -t buster-backports linux-image-cloud-amd64 linux-headers-cloud-amd64 -y
             ;;
